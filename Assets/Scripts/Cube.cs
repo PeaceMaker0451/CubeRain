@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(ColorChanger), typeof(Timer), typeof(Rigidbody))]
 public class Cube : Particle
@@ -19,29 +18,32 @@ public class Cube : Particle
         _despawnTimer = GetComponent<Timer>();
         _rigidBody = GetComponent<Rigidbody>();
 
-        _despawnTimer.TimerEnded += () => Despawn();
-        
-        StateReset += OnReset;
-        Triggered += OnCollisionConfirmed;
+        _despawnTimer.TimerEnded += Despawn;
     }
 
-    private void OnReset()
+    private void OnDestroy()
+    {
+        _despawnTimer.TimerEnded -= Despawn;
+    }
+
+    private float GetDespawnDelay()
+    {
+        return UnityEngine.Random.Range(_minDespawnDelay, _maxDespawnDelay);
+    }
+
+    protected override void OnInitialized() { }
+
+    protected override void OnStateReset()
     {
         _colorChanger.SetColor(_defaultColor);
         _rigidBody.velocity = Vector3.zero;
         _rigidBody.angularVelocity = Vector3.zero;
     }
 
-    private void OnCollisionConfirmed()
+    protected override void OnTriggered()
     {
         _colorChanger.RandomizeColor();
         float despawnDelay = GetDespawnDelay();
         _despawnTimer.StartTimer(despawnDelay);
-    }
-
-    private float GetDespawnDelay()
-    {
-        float time = UnityEngine.Random.Range(_minDespawnDelay, _maxDespawnDelay);
-        return time;
     }
 }

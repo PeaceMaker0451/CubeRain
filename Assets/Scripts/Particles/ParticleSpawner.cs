@@ -1,37 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
+[RequireComponent(typeof(Timer))]
 public class ParticleSpawner : MonoBehaviour
 {
     [SerializeField] private Particle _prefab;
-    [SerializeField] private float _spawnTimer;
+    [SerializeField] private float _spawnTime;
 
     private ObjectPool<Particle> _pool;
-
-    private float _time = 0f;
+    private Timer _createTimer;
 
     private void Start()
     {
         _pool = new ObjectPool<Particle>(_prefab);
-        _pool.ObjectCreated += (particle) => particle.Initialize((particle) =>
-        {
-            particle.gameObject.SetActive(false);
-            _pool.Release(particle);
-        });
+        _pool.ObjectCreated += InitializeParticle;
+
+        _createTimer = GetComponent<Timer>();
+        _createTimer.TimerEnded += OnTimerEnded;
+        _createTimer.StartTimer(_spawnTime);
     }
 
-    private void Update()
+    private void OnDestroy()
     {
-        _time -= Time.deltaTime;
-
-        if (_time <= 0f)
-        {
-            Spawn();
-            _time = _spawnTimer;
-        }
-            
+        _pool.ObjectCreated -= InitializeParticle; //мне правда нужно как по мантре отписываться от событий, которые полностью находятся под контролем этого объекта (и на этом объекте) и не могут быть сломаны "случайно"? 
+        _createTimer.TimerEnded -= OnTimerEnded;
     }
 
     private void Spawn()
@@ -46,15 +37,33 @@ public class ParticleSpawner : MonoBehaviour
     private Vector3 GetRandomPosition()
     {
         var spawnerTransform = this.transform;
+        float unitCubeSize = 1f;
         
         var scale = spawnerTransform.lossyScale;
 
         var randomOffset = new Vector3(
-            Random.Range(-1f / 2f, 1f / 2f),
-            Random.Range(-1f / 2f, 1f / 2f),
-            Random.Range(-1f / 2f, 1f / 2f));
+            Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f),
+            Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f),
+            Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f));
 
         var randomPosition = spawnerTransform.TransformPoint(randomOffset);
         return randomPosition;
+    }
+
+    private void OnTimerEnded()
+    {
+        Spawn();
+        _createTimer.StartTimer(_spawnTime);
+    }
+
+    private void InitializeParticle(Particle particle)
+    {
+        particle.Initialize(DespawnParticle);
+    }
+    
+    private void DespawnParticle(Particle particle)
+    {
+        particle.gameObject.SetActive(false);
+        _pool.Release(particle);
     }
 }

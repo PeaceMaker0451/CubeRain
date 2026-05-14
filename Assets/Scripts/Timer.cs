@@ -1,16 +1,15 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Timer : MonoBehaviour
 {
-    public Action TimerEnded;
-    
-    public float Time {  get; private set; }
+    public event Action TimerEnded;
+
     public bool IsCounting { get; private set; }
 
-    void Update()
+    private float _time;
+
+    private void Update()
     {
         Count();
     }
@@ -21,7 +20,7 @@ public class Timer : MonoBehaviour
             throw new InvalidOperationException("Время на таймере должно быть больше нуля.");
         
         IsCounting = true;
-        Time = time;
+        _time = time + Time.time;
     }
 
     public void StopTimer()
@@ -34,9 +33,7 @@ public class Timer : MonoBehaviour
         if (IsCounting == false)
             return;
 
-        Time -= UnityEngine.Time.deltaTime;
-
-        if( Time <= 0 )
+        if( _time <= Time.time )
         {
             IsCounting = false;
             TimerEnded?.Invoke();

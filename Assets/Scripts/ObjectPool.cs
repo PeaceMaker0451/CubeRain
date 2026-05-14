@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class ObjectPool<T> where T : UnityEngine.Object
 {
-    public Action<T> ObjectCreated;
+    public event Action<T> ObjectCreated;
     
     private T _prefab;
     private Stack<T> _freeObjects;

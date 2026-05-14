@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3055284797769520188}
   - component: {fileID: 5841994095780147029}
   - component: {fileID: 4132347380657849003}
-  - component: {fileID: 2915040824313042719}
+  - component: {fileID: 5136463344552775510}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -160,7 +160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 001c16e84de059647adc62e81daccbf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2915040824313042719
+--- !u!114 &5136463344552775510
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -169,9 +169,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 654249240262538857}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4744563082d72b4ab44d72071e14a15, type: 3}
+  m_Script: {fileID: 11500000, guid: bd2e1d2699d67e84eb481bb977b5f537, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _defaultColor: {r: 1, g: 0.96657693, b: 0, a: 0}
+  _defaultColor: {r: 1, g: 0.90821266, b: 0, a: 0}
   _minDespawnDelay: 2
   _maxDespawnDelay: 5

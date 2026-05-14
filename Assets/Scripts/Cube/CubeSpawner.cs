@@ -1,17 +1,17 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Timer))]
-public class ParticleSpawner : MonoBehaviour
+public class CubeSpawner : MonoBehaviour
 {
-    [SerializeField] private Particle _prefab;
+    [SerializeField] private Cube _prefab;
     [SerializeField] private float _spawnTime;
 
-    private ObjectPool<Particle> _pool;
+    private ObjectPool<Cube> _pool;
     private Timer _createTimer;
 
     private void Start()
     {
-        _pool = new ObjectPool<Particle>(_prefab);
+        _pool = new ObjectPool<Cube>(_prefab);
         _pool.ObjectCreated += InitializeParticle;
 
         _createTimer = GetComponent<Timer>();
@@ -21,7 +21,7 @@ public class ParticleSpawner : MonoBehaviour
 
     private void OnDestroy()
     {
-        _pool.ObjectCreated -= InitializeParticle; //мне правда нужно как по мантре отписываться от событий, которые полностью находятся под контролем этого объекта (и на этом объекте) и не могут быть сломаны "случайно"? 
+        _pool.ObjectCreated -= InitializeParticle; 
         _createTimer.TimerEnded -= OnTimerEnded;
     }
 
@@ -56,12 +56,12 @@ public class ParticleSpawner : MonoBehaviour
         _createTimer.StartTimer(_spawnTime);
     }
 
-    private void InitializeParticle(Particle particle)
+    private void InitializeParticle(Cube particle)
     {
         particle.Initialize(DespawnParticle);
     }
     
-    private void DespawnParticle(Particle particle)
+    private void DespawnParticle(Cube particle)
     {
         particle.gameObject.SetActive(false);
         _pool.Release(particle);

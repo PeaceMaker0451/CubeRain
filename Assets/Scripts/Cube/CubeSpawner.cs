@@ -1,69 +1,68 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Timer))]
-public class CubeSpawner : MonoBehaviour
+public class CubeSpawner : Spawner<Cube>
 {
-    [SerializeField] private Cube _prefab;
     [SerializeField] private float _spawnTime;
 
-    private ObjectPool<Cube> _pool;
     private Timer _createTimer;
+
+    private void Awake()
+    {
+        _createTimer = GetComponent<Timer>();
+    }
 
     private void Start()
     {
-        _pool = new ObjectPool<Cube>(_prefab);
-        _pool.ObjectCreated += InitializeParticle;
-
-        _createTimer = GetComponent<Timer>();
-        _createTimer.TimerEnded += OnTimerEnded;
+        Initialize(InitializeParticle, OnDespawn);
         _createTimer.StartTimer(_spawnTime);
     }
 
-    private void OnDestroy()
+    private void OnEnable()
     {
-        _pool.ObjectCreated -= InitializeParticle; 
+        _createTimer.TimerEnded += OnTimerEnded;
+    }
+
+    private void OnDisable()
+    {
         _createTimer.TimerEnded -= OnTimerEnded;
     }
 
-    private void Spawn()
+    private void OnTimerEnded()
     {
-        var cube = _pool.Get();
+        var cube = Spawn();
         cube.gameObject.SetActive(true);
         cube.transform.position = GetRandomPosition();
         cube.transform.rotation = Quaternion.identity;
-        cube.ResetState();
+        cube.ResetParticle();
+
+        _createTimer.StartTimer(_spawnTime);
+    }
+
+    private void InitializeParticle(Cube particle, Action despawnAction)
+    {
+        particle.Initialize(despawnAction);
+    }
+    
+    private void OnDespawn(Cube particle)
+    {
+        particle.gameObject.SetActive(false);
     }
 
     private Vector3 GetRandomPosition()
     {
         var spawnerTransform = this.transform;
         float unitCubeSize = 1f;
-        
+
         var scale = spawnerTransform.lossyScale;
 
         var randomOffset = new Vector3(
-            Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f),
-            Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f),
-            Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f));
+            UnityEngine.Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f),
+            UnityEngine.Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f),
+            UnityEngine.Random.Range(-unitCubeSize / 2f, unitCubeSize / 2f));
 
         var randomPosition = spawnerTransform.TransformPoint(randomOffset);
         return randomPosition;
-    }
-
-    private void OnTimerEnded()
-    {
-        Spawn();
-        _createTimer.StartTimer(_spawnTime);
-    }
-
-    private void InitializeParticle(Cube particle)
-    {
-        particle.Initialize(DespawnParticle);
-    }
-    
-    private void DespawnParticle(Cube particle)
-    {
-        particle.gameObject.SetActive(false);
-        _pool.Release(particle);
     }
 }

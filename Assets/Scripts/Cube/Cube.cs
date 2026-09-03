@@ -12,7 +12,7 @@ public class Cube : MonoBehaviour
     private Timer _despawnTimer;
     private Rigidbody _rigidBody;
 
-    private Action<Cube> _despawnAction;
+    private Action _despawnAction;
 
     public bool IsTriggered { get; private set;  }
 
@@ -33,12 +33,12 @@ public class Cube : MonoBehaviour
         _despawnTimer.TimerEnded -= Despawn;
     }
 
-    public void Initialize(Action<Cube> onDespawn)
+    public void Initialize(Action onDespawn)
     {
         _despawnAction = onDespawn;
     }
 
-    public void ResetState()
+    public void ResetParticle()
     { 
         IsTriggered = false;
         _colorChanger.SetColor(_defaultColor);
@@ -59,7 +59,7 @@ public class Cube : MonoBehaviour
 
     private void Despawn()
     {
-        _despawnAction?.Invoke(this);
+        _despawnAction?.Invoke();
     }
 
     private float GetDespawnDelay()

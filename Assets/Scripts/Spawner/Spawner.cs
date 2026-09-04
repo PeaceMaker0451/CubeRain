@@ -7,14 +7,17 @@ public abstract class Spawner<T> : BaseSpawner where T : UnityEngine.Object
 
     private ObjectPool<T> _pool;
 
-    private Action<T, Action> _onInitialized;
-    private Action<T> _onDespawned;
-
     public event Action<T> Despawned;
 
     public override int TotalObjects => _pool.TotalObjects;
     public override int TotalSpawned => _pool.TotalSpawned;
     public override int FreeObjects => _pool.FreeObjects;
+
+    protected virtual void Awake()
+    {
+        _pool = new ObjectPool<T>(_prefab);
+        _pool.ObjectCreated += InitializeParticle;
+    }
 
     protected T Spawn()
     {
@@ -23,24 +26,19 @@ public abstract class Spawner<T> : BaseSpawner where T : UnityEngine.Object
         return particle;
     }
 
-    protected void Initialize(Action<T, Action> onInitialize, Action<T> onDespawned)
-    {
-        _onInitialized = onInitialize;
-        _onDespawned = onDespawned;
+    protected abstract void InitializeParticle(T particle, Action despawnAction);
 
-        _pool = new ObjectPool<T>(_prefab);
-        _pool.ObjectCreated += InitializeParticle;
-    }
+    protected abstract void DespawnParticle(T particle);
 
     private void InitializeParticle(T particle)
     {
-        _onInitialized?.Invoke(particle, () => Despawn(particle));
+        InitializeParticle(particle, () => Despawn(particle));
         InvokeParticleCreated();
     }
 
     private void Despawn(T particle)
     {
-        _onDespawned?.Invoke(particle);
+        DespawnParticle(particle);
         _pool.Release(particle);
         Despawned?.Invoke(particle);
     }

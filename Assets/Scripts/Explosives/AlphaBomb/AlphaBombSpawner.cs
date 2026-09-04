@@ -3,11 +3,6 @@ using UnityEngine;
 
 public class AlphaBombSpawner : Spawner<AlphaBomb>
 {
-    private void Start()
-    {
-        Initialize(InitializeParticle, OnDespawn);
-    }
-
     public void Spawn(Vector3 position)
     {
         var bomb = Spawn();
@@ -18,12 +13,12 @@ public class AlphaBombSpawner : Spawner<AlphaBomb>
         bomb.Explode();
     }
 
-    private void InitializeParticle(AlphaBomb particle, Action despawnAction)
+    protected override void InitializeParticle(AlphaBomb particle, Action despawnAction)
     {
         particle.Initialize(despawnAction);
     }
 
-    private void OnDespawn(AlphaBomb particle)
+    protected override void DespawnParticle(AlphaBomb particle)
     {
         particle.gameObject.SetActive(false);
     }

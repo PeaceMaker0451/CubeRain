@@ -8,14 +8,14 @@ public class CubeSpawner : Spawner<Cube>
 
     private Timer _createTimer;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         _createTimer = GetComponent<Timer>();
     }
 
     private void Start()
     {
-        Initialize(InitializeParticle, OnDespawn);
         _createTimer.StartTimer(_spawnTime);
     }
 
@@ -29,6 +29,16 @@ public class CubeSpawner : Spawner<Cube>
         _createTimer.TimerEnded -= OnTimerEnded;
     }
 
+    protected override void InitializeParticle(Cube particle, Action despawnAction)
+    {
+        particle.Initialize(despawnAction);
+    }
+
+    protected override void DespawnParticle(Cube particle)
+    {
+        particle.gameObject.SetActive(false);
+    }
+
     private void OnTimerEnded()
     {
         var cube = Spawn();
@@ -38,16 +48,6 @@ public class CubeSpawner : Spawner<Cube>
         cube.ResetParticle();
 
         _createTimer.StartTimer(_spawnTime);
-    }
-
-    private void InitializeParticle(Cube particle, Action despawnAction)
-    {
-        particle.Initialize(despawnAction);
-    }
-    
-    private void OnDespawn(Cube particle)
-    {
-        particle.gameObject.SetActive(false);
     }
 
     private Vector3 GetRandomPosition()

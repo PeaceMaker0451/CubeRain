@@ -13,9 +13,23 @@ public class SpawnerDataUI : MonoBehaviour
         _text = GetComponent<Text>();
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        _text.text = $"Текущее количество объектов: {_spawner.TotalObjects}" +
+        _spawner.ParticleCreated += UpdateText;
+        _spawner.ParticleSpawned += UpdateText;
+        
+        UpdateText();
+    }
+
+    private void OnDisable()
+    {
+        _spawner.ParticleCreated -= UpdateText;
+        _spawner.ParticleSpawned -= UpdateText;
+    }
+
+    private void UpdateText()
+    {
+        _text.text = $"Общее количество объектов: {_spawner.TotalObjects}" +
             $"\nВсего было заспавнено: {_spawner.TotalSpawned}" +
             $"\nКоличество свободных объектов: {_spawner.FreeObjects}" +
             $"\nКоличество активных объектов: {_spawner.TotalObjects - _spawner.FreeObjects}";
